@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ПрофКейс — отбор новичков по реальным рабочим задачам</title>
+<style>
+:root{
+  --p:#4f46e5; --p2:#7c3aed; --pl:#eef2ff;
+  --g:#059669; --gl:#ecfdf5;
+  --a:#d97706; --al:#fffbeb;
+  --r:#dc2626; --rl:#fef2f2;
+  --ink:#111827; --mut:#6b7280; --line:#e5e7eb;
+  --bg:#f6f7fb; --card:#ffffff;
+  --sh:0 1px 2px rgba(16,24,40,.05),0 4px 16px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55}
+a{color:var(--p);text-decoration:none}
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* header */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:28px;height:62px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--ink);white-space:nowrap}
+.logo .mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+nav.main{display:flex;gap:4px;flex:1}
+nav.main a{padding:8px 14px;border-radius:9px;color:#374151;font-weight:600;font-size:14px}
+nav.main a:hover{background:var(--pl);color:var(--p)}
+nav.main a.on{background:var(--pl);color:var(--p)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;padding:10px 18px;border-radius:10px;transition:.15s}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff}
+.btn-p:hover{filter:brightness(1.08)}
+.btn-o{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-o:hover{border-color:var(--p);color:var(--p)}
+.btn-g{background:var(--g);color:#fff}
+.btn-r{background:var(--r);color:#fff}
+.btn-sm{padding:7px 13px;font-size:13px}
+.btn-lg{padding:14px 26px;font-size:16px;border-radius:12px}
+.btn:disabled{opacity:.55;cursor:default}
+
+/* generic */
+main{padding:32px 0 64px;min-height:calc(100vh - 130px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+.pad{padding:24px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+.b-pl{background:var(--pl);color:var(--p)}
+.b-gl{background:var(--gl);color:var(--g)}
+.b-al{background:var(--al);color:var(--a)}
+.b-rl{background:var(--rl);color:var(--r)}
+.b-gr{background:#f3f4f6;color:#374151}
+h1{font-size:34px;line-height:1.2;letter-spacing:-.5px}
+h2{font-size:24px;letter-spacing:-.3px}
+h3{font-size:17px}
+.mut{color:var(--mut)}
+.sm{font-size:13px}
+.xs{font-size:12px}
+.row{display:flex;align-items:center;gap:12px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}.mb16{margin-bottom:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:13px;font-weight:600;margin-bottom:14px}
+.back:hover{color:var(--p)}
+
+/* score helpers */
+.avg{font-weight:800;font-size:22px}
+.sc-hi{color:var(--g)}.sc-mid{color:var(--a)}.sc-lo{color:var(--r)}
+.crit{margin-top:12px}
+.crit-head{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px}
+.crit-head .w{color:var(--mut);font-weight:500}
+.bar{height:8px;background:#eef0f4;border-radius:99px;overflow:hidden}
+.fill{height:100%;border-radius:99px;transition:width .6s}
+
+/* hero */
+.hero{padding:64px 0 40px;text-align:center}
+.hero h1{font-size:44px;max-width:840px;margin:0 auto}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:640px;margin:18px auto 0;font-size:17px;color:#374151}
+.cta{display:flex;gap:14px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+
+/* stats band */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:48px 0}
+.stat{padding:20px;text-align:center}
+.stat .n{font-size:30px;font-weight:800;background:linear-gradient(135deg,var(--p),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat p{font-size:13px;color:var(--mut);margin-top:4px}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step{padding:22px}
+.step .num{width:34px;height:34px;border-radius:10px;background:var(--pl);color:var(--p);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+.step h3{margin:12px 0 6px}
+.step p{font-size:13.5px;color:var(--mut)}
+
+/* quotes */
+.quote{padding:20px;border-left:4px solid var(--p)}
+.quote p{font-size:14.5px;font-style:italic}
+.quote .who{margin-top:10px;font-size:12.5px;color:var(--mut);font-style:normal}
+
+/* vacancy cards */
+.vac{padding:22px;display:flex;flex-direction:column;gap:10px;transition:.15s}
+.vac:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(79,70,229,.13)}
+.vac h3{font-size:17px}
+.sph{font-size:12px;font-weight:700}
+.s-law{color:#7c3aed;background:#f5f3ff}
+.s-mkt{color:#d97706;background:#fffbeb}
+.s-it{color:#059669;background:#ecfdf5}
+
+/* employer dash */
+.kpi{padding:18px}
+.kpi .n{font-size:26px;font-weight:800}
+.kpi p{font-size:12.5px;color:var(--mut)}
+.cand{display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+.cand:last-child{border-bottom:none}
+.cand:hover{background:#fafbff}
+.ava{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.mini-crit{display:flex;gap:4px;margin-top:4px}
+.mini-crit i{display:block;width:34px;height:6px;border-radius:99px;background:#eef0f4}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--line);margin-bottom:20px}
+.tabs button{border:none;background:none;font-family:inherit;font-size:14px;font-weight:600;color:var(--mut);padding:10px 16px;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
+.tabs button.on{color:var(--p);border-color:var(--p)}
+
+/* wizard */
+.wiz-steps{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.wstep{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--mut);padding:7px 12px;border-radius:99px;background:#fff;border:1px solid var(--line)}
+.wstep.on{background:var(--pl);border-color:var(--pl);color:var(--p)}
+.wstep.done{background:var(--gl);border-color:var(--gl);color:var(--g)}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.field input[type=text],.field select,.field textarea{width:100%;font-family:inherit;font-size:14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;outline:none;background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s,background .15s}
+.field textarea{resize:vertical;line-height:1.6}
+.field input[type=text]:hover,.field select:hover,.field textarea:hover{border-color:#c7cbd4}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.11);background:#fdfdff}
+input,select,textarea{accent-color:var(--p)}
+::selection{background:rgba(79,70,229,.16)}
+textarea::-webkit-scrollbar{width:10px}
+textarea::-webkit-scrollbar-track{background:transparent}
+textarea::-webkit-scrollbar-thumb{background:#d8dbe2;border-radius:99px;border:3px solid #fff}
+textarea::-webkit-scrollbar-thumb:hover{background:#b9bec9}
+textarea::placeholder,input::placeholder{color:#9aa1ad}
+.hint{font-size:12px;color:var(--mut);margin-top:6px}
+mark{padding:1px 3px;border-radius:4px;font-weight:600}
+mark.conf{background:#fee2e2;color:#b91c1c;text-decoration:line-through}
+mark.anon{background:#d1fae5;color:#047857}
+.del{background:#fee2e2;color:#b91c1c;text-decoration:line-through;padding:1px 3px;border-radius:4px;font-weight:600}
+.diffbox{padding:18px;font-size:13.5px;line-height:1.7;background:#fff}
+.diffbox h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:7px 14px;font-size:13px;font-weight:600;margin:0 8px 8px 0}
+.chip .w{color:var(--mut);font-weight:500}
+
+/* processing */
+.proc{max-width:560px;margin:60px auto;text-align:center}
+.proc .spin{width:54px;height:54px;border-radius:50%;border:5px solid var(--pl);border-top-color:var(--p);margin:0 auto 24px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.proc ul{text-align:left;max-width:380px;margin:24px auto 0;list-style:none}
+.proc li{padding:9px 0 9px 28px;position:relative;color:var(--mut);font-size:14px}
+.proc li.done{color:var(--g)}
+.proc li.done:before{content:'✓';position:absolute;left:0;font-weight:800}
+.proc li.act{color:var(--ink);font-weight:600}
+.proc li.act:before{content:'●';position:absolute;left:2px;color:var(--p);font-size:10px;top:12px}
+
+/* task layout */
+.task-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.editor-wrap{border:1.5px solid var(--line);border-radius:14px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.editor-wrap:focus-within{border-color:var(--p);box-shadow:0 0 0 4px rgba(79,70,229,.11)}
+.editor-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:#f9fafb;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:700;color:#374151}
+.editor-head .cnt{font-weight:600;color:var(--mut);font-size:12px}
+.editor-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 16px;background:#f9fafb;border-top:1px solid var(--line);font-size:12px;color:var(--mut)}
+.editor-wrap.dragover{border-color:var(--p);border-style:dashed;background:var(--pl)}
+.linkbtn{border:none;background:none;font-family:inherit;font-size:12px;color:var(--p);font-weight:700;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:5px}
+.linkbtn:hover{text-decoration:underline}
+.filechip{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;border:1.5px dashed #c7d2fe;background:var(--pl);border-radius:12px;font-size:13px;font-weight:700;color:var(--p);max-width:100%}
+.filechip .fname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filechip .sz{color:var(--mut);font-weight:500;font-size:12px;flex-shrink:0}
+.filechip .rm{margin-left:auto;border:none;background:#fff;color:var(--mut);width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;transition:.12s}
+.filechip .rm:hover{background:var(--rl);color:var(--r)}
+.dropzone{border:2px dashed #c7d2fe;border-radius:14px;background:#fafbff;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone:hover{border-color:var(--p);background:var(--pl)}
+.dropzone.dragover{border-color:var(--p);border-style:solid;background:var(--pl)}
+.dropzone .ic{font-size:32px}
+.dropzone .big{font-size:15px;font-weight:700;margin-top:8px}
+.dropzone .fmts{font-size:12.5px;color:var(--mut);margin-top:4px}
+.filebar{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fafbff}
+.filebar .fico{width:40px;height:40px;border-radius:10px;background:var(--pl);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.filebar .fmeta{flex:1;min-width:0}
+.filebar b{font-size:13.5px;word-break:break-all}
+.solution-editor{display:block;width:100%;min-height:320px;padding:16px 18px;border:none;outline:none;font-family:inherit;font-size:14px;line-height:1.7;resize:vertical;background:#fff;color:var(--ink)}
+.num-in{width:56px;border:1.5px solid var(--line);border-radius:8px;padding:4px 6px;font-family:inherit;font-size:13px;text-align:center;outline:none;background:#fff;transition:border-color .15s,box-shadow .15s}
+.num-in:hover{border-color:#c7cbd4}
+.num-in:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(79,70,229,.11)}
+.sol-text{font-size:14px;line-height:1.75;white-space:pre-wrap;background:#fafbff;padding:18px;border-radius:12px;border:1px solid var(--line)}
+pre.code{background:#0f172a;color:#e2e8f0;padding:18px;border-radius:12px;font-size:12.5px;line-height:1.6;overflow-x:auto;font-family:Consolas,'Courier New',monospace}
+
+/* misc */
+.pill-list{display:flex;gap:8px;flex-wrap:wrap}
+.timer{display:inline-flex;align-items:center;gap:8px;background:var(--al);color:var(--a);font-weight:700;font-size:13px;padding:7px 14px;border-radius:99px}
+.tick{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;padding:6px 0}
+.tick:before{content:'✓';color:var(--g);font-weight:800}
+.tick.imp:before{content:'→';color:var(--a)}
+footer{border-top:1px solid var(--line);padding:22px 0;font-size:12.5px;color:var(--mut);background:#fff}
+
+/* modal */
+#modal-root{position:fixed;inset:0;z-index:100;display:none}
+#modal-root.open{display:block}
+.overlay{position:absolute;inset:0;background:rgba(15,23,42,.55)}
+.modal{position:relative;max-width:680px;margin:5vh auto;background:#fff;border-radius:18px;max-height:88vh;overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+.modal .x{position:absolute;top:14px;right:14px;border:none;background:#f3f4f6;width:32px;height:32px;border-radius:9px;font-size:15px;cursor:pointer;font-weight:700;color:#374151}
+.modal .x:hover{background:#e5e7eb}
+
+/* toast */
+#toast-root{position:fixed;bottom:24px;right:24px;z-index:120;display:flex;flex-direction:column;gap:10px}
+.toast{background:#111827;color:#fff;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.25);animation:pop .25s}
+.toast.ok{background:var(--g)}
+@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+
+.follow{border:1.5px solid #fde68a;background:var(--al);border-radius:14px;padding:18px}
+.flag{display:inline-flex;align-items:center;gap:7px;background:var(--rl);color:var(--r);font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:99px}
+.divider{height:1px;background:var(--line);margin:18px 0}
+@media(max-width:900px){.grid2,.grid3,.grid4,.steps,.stats{grid-template-columns:1fr 1fr}.task-grid{grid-template-columns:1fr}.hero h1{font-size:32px}}
+@media(max-width:560px){.grid3,.grid4{grid-template-columns:1fr}nav.main{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container hd">
+    <a href="#/" class="logo"><span class="mark">ПК</span>ПрофКейс</a>
+    <nav class="main" id="nav"></nav>
+  </div>
+</header>
+
+<main><div class="container" id="app"></div></main>
+
+<footer style="display:none"></footer>
+<div id="modal-root"><div class="overlay" onclick="App.closeModal()"></div><div class="modal" id="modal-body"></div></div>
+<div id="toast-root"></div>
+
+<script>
+const APP_NAME = 'ПрофКейс';
+
+/* ================= ДАННЫЕ ================= */
+
+const DB = {
+  vacancies: [
+    {
+      id:'law', icon:'⚖️', sphere:'Юриспруденция', sc:'s-law',
+      title:'Помощник юриста (договорная работа)',
+      company:'Юридическая фирма «Правовой стандарт»', city:'Санкт-Петербург',
+      level:'Можно без опыта', salary:'от 45 000 ₽', work:'Гибрид, 2/3 дня в офисе',
+      short:'Помощь юристам в проверке договоров, претензионной работе и подготовке заключений для клиентов.',
+      taskTime:'2,5 часа',
+      taskIntro:'Клиент фирмы просит проверить договор подряда перед подписанием. Этим займётся юрист, но ему нужно ваше заключение как первый фильтр: какие пункты опасны для заказчика и что поправить.',
+      taskSteps:[
+        'Найдите 3–4 пункта договора, создающих риски для заказчика (сроки, ответственность, приёмка).',
+        'Для каждого пункта укажите применимую норму ГК РФ одним предложением.',
+        'Предложите конкретную правку формулировки (что заменить и на что).',
+        'Напишите краткое заключение на 5–7 предложений для руководителя клиента.'
+      ],
+      materials:['Договор подряда № 147 между ООО «Альфа» и АО «Бета» (PDF)','Шаблон заключения фирмы'],
+      criteria:[
+        {n:'Выявление ключевых рисков договора',w:30},
+        {n:'Знание применимых норм (ГК РФ)',w:25},
+        {n:'Качество предлагаемых правок',w:25},
+        {n:'Ясность и структура заключения',w:20}
+      ],
+      followUp:'В 2–3 предложениях объясните: какую норму вы считаете ключевой для защиты заказчика в этом договоре и почему именно она?',
+      feedback:{avg:'4,6',scores:[4.8,4.6,4.6,4.4],
+        strengths:['Нашла риск в п. 7.3 (односторонний отказ подрядчика), который пропустили почти все','Правки сформулированы как готовый текст для договора, а не как абстрактные советы','Заключение структурировано: сначала вывод, потом обоснование'],
+        improve:['Добавить ссылки на судебную практику по ст. 708 ГК РФ','Сократить вступительную часть заключения']},
+      candidates:[
+        {name:'Анна Смирнова', meta:'СПбГУ, юрфак, 4 курс', date:'2 ноя', avg:4.6, status:'rec',
+         scores:[4.8,4.6,4.6,4.4],
+         file:{name:'Smirnova_договор_147_заключение.pdf',size:248320,type:'pdf'},
+         solution:'1. П. 4.2 — срок сдачи работ установлен, но неустойка за просрочку подрядчика не определена → ст. 708 ГК РФ. Правка: дополнить пункт неустойкой 0,1% от цены работ за каждый день просрочки.\n2. П. 5.1 — ответственность подрядчика ограничена 1% цены работ → ст. 400 ГК РФ. Правка: поднять предел до 10% и исключить ущерб от него.\n3. П. 6.3 — приёмка без акта при молчании заказчика 3 дня → ст. 720 ГК РФ. Правка: срок 10 рабочих дней + письменное уведомление.\n4. П. 7.3 — подрядчик вправе отказаться от договора в одностороннем порядке без компенсации → ст. 310 ГК РФ. Правка: только по соглашению сторон либо с компенсацией фактически понесённых расходов заказчика.\n\nЗаключение: договор подписывать преждевременно. Ключевой риск — п. 7.3...',
+         comment:'Единственная из кандидатов заметила п. 7.3 об одностороннем отказе — реально встречается в практике фирмы. Заключение можно почти без правок отправить клиенту.',
+         follow:{a:'Ключевая — ст. 310 ГК РФ в связке с п. 7.3: подрядчик прописал себе право выйти из договора в любой момент, а заказчик такой возможности не получил. Это перекладывает все расходы на заказчика, поэтому именно этот пункт я бы правила первым.', badge:'ok', btxt:'Самостоятельно, развёрнуто'}},
+        {name:'Дмитрий Ковалёв', meta:'ВШЭ СПб, юрфак, выпускник', date:'1 ноя', avg:3.7, status:'wait',
+         scores:[4.0,3.6,3.4,3.9],
+         file:{name:'Kovalev_заключение_договор_147.pdf',size:186112,type:'pdf'},
+         solution:'1. П. 4.2 — сроки: нет неустойки за просрочку (ст. 708 ГК РФ). Предлагаю добавить ответственность.\n2. П. 5.1 — предел ответственности низкий, предлагаю пересмотреть.\n3. П. 6.3 — приёмка работ: срок на проверку слишком короткий.\n\nЗаключение: договор в целом типовой, но требует доработки...',
+         comment:'Риски по срокам и ответственности нашёл, но п. 7.3 пропустил. Правки сформулированы абстрактно («пересмотреть»), без готового текста.',
+         follow:{a:'Ст. 708 ГК РФ про сроки, она главная, потому что сроки в договоре нарушаются чаще всего.', badge:'mid', btxt:'Ответ краткий, но по делу'}},
+        {name:'Мария Волкова', meta:'Другой вуз, онлайн-курс договорной работы', date:'31 окт', avg:2.9, status:'risk',
+         scores:[3.0,2.5,2.9,3.2],
+         file:{name:'Решение_договора_финал_2.pdf',size:92160,type:'pdf'},
+         solution:'Данный договор содержит существенные риски для заказчика, которые могут повлечь негативные последствия. Во-первых, необходимо обратить внимание на положения о сроках. Во-вторых, важное значение имеет ответственность сторон. Гражданский кодекс Российской Федерации регулирует данные отношения комплексно. Целесообразно провести детальный анализ и внести корректировки...',
+         comment:'Текст общими словами, без указания конкретных пунктов договора и норм. Стиль типичен для генерированного ответа.',
+         follow:{a:'Нужно смотреть Гражданский кодекс, там всё про договоры прописано, я опиралась на общие положения.', badge:'lo', btxt:'Не смогла объяснить выбор норм'},
+         flag:'Похоже на решение через ИИ: нет привязки к пунктам договора, ответ на уточняющий вопрос не по существу'}
+      ]
+    },
+    {
+      id:'mkt', icon:'📣', sphere:'Маркетинг', sc:'s-mkt',
+      title:'SMM-специалист (junior)',
+      company:'Маркетинговое агентство «Пиксель»', city:'Санкт-Петербург',
+      level:'Можно без опыта', salary:'от 40 000 ₽', work:'Офис на Петроградке',
+      short:'Контент для клиентов агентства: кофейни, клиники, локальные бренды. Контент-планы, тексты, аналитика.',
+      taskTime:'2 часа',
+      taskIntro:'В агентство пришёл новый клиент — сеть кофеен. Старший SMM-щик собрал бриф. Вам как первому фильтру нужно предложить концепцию недели.',
+      taskSteps:[
+        'Опишите ЦА кофейни у метро в спальном районе (3–4 портрета одним предложением каждый).',
+        'Составьте контент-план на неделю: день, тема, формат, идея коротко.',
+        'Напишите текст одного поста (до 150 слов) под любую позицию плана.',
+        'Обоснуйте выбор: почему эти форматы сработают именно на эту ЦА.'
+      ],
+      materials:['Бриф клиента: кофейня у метро, средний чек 350 ₽, студенты и молодые специалисты рядом','Пример контент-плана агентства'],
+      criteria:[
+        {n:'Понимание целевой аудитории',w:30},
+        {n:'Идеи и креативность',w:25},
+        {n:'Структура и реалистичность плана',w:25},
+        {n:'Грамотность и стиль текстов',w:20}
+      ],
+      followUp:'Почему для этой аудитории вы выбрали именно вечерние слоты для постов? Ответ в 2–3 предложениях.',
+      feedback:{avg:'4,2',scores:[4.5,4.3,4.0,4.0],
+        strengths:['Понял реальную аудиторию конкретной кофейни, а не «молодёжь вообще»','В каждой позиции плана — готовая идея, которую можно отдавать дизайнеру','Текст поста звучит по-человечески, без канцелярита'],
+        improve:['Добавить в план UGC-механику: гости кофейни — главный источник контента','Проверить опечатки в тексте поста']},
+      candidates:[
+        {name:'Игорь Лаврентьев', meta:'Самостоятельно вёл телеграм-канал на 2 400 подписчиков', date:'3 ноя', avg:4.2, status:'rec',
+         scores:[4.5,4.3,4.0,4.0],
+         file:{name:'lavrentiev_kontent_plan_nedelya.html',size:34816,type:'html'},
+         solution:'ЦА: 1) студенты соседнего вуза — заходят между парами, ищут дешёвый кофе и место посидеть с ноутбуком; 2) молодые специалисты с удалёнкой — «третье место» утром и днём; 3) местные жители — выходные, десерты...\n\nПн — пост «как проходит утро бариста» (фото-история); Вт — опрос «какой сироп добавить в сезонное меню»... Текст поста: «Мы открылись в 8:00, а очередь из студентов — к 9:15...»',
+         comment:'Редкий случай, когда junior пишет идеи, которые можно запускать без доработки. План реалистичен по силам одного SMM-щика.',
+         follow:{a:'Студенты листают ленту вечером в метро по дороге домой, а удалёнщики в 19:00 как раз освобождаются. Утренний пост увидят к обеду, вечерний — сразу в прайм.', badge:'ok', btxt:'Самостоятельно, логично'}},
+        {name:'Ольга Рябцева', meta:'Курсы по SMM, кейсов не было', date:'1 ноя', avg:3.4, status:'wait',
+         scores:[3.5,3.6,3.3,3.2],
+         file:{name:'ryabtseva_plan.html',size:27648,type:'html'},
+         solution:'ЦА — молодые люди 18–35, активные в соцсетях.\nПн — мотивация; Вт — продукт; Ср — вовлечение; Чт — экспертность; Пт — анонс выходных...',
+         comment:'План собран по классической схеме с курсов, но без привязки к конкретной кофейне и району. Тексты чистые, но безличные.',
+         follow:{a:'Вечером все сидят в телефонах, поэтому вечерние посты эффективнее, это знают все SMM-щики.', badge:'mid', btxt:'Ответ общий, без привязки к ЦА'}}
+      ]
+    },
+    {
+      id:'it', icon:'💻', sphere:'IT', sc:'s-it',
+      title:'Junior Frontend-разработчик',
+      company:'Digital-студия «ДатаЛаб»', city:'Санкт-Петербург',
+      level:'Можно без опыта', salary:'от 60 000 ₽', work:'Удалённо / офис',
+      short:'Вёрстка лендингов и форм под руководством тимлида, участие в проектах студии.',
+      taskTime:'3 часа',
+      taskIntro:'Тимлид собрал типовую задачу студии: форма подписки на рассылку клиента. Такую же дают новичкам в первый месяц работы.',
+      taskSteps:[
+        'Сверстайте форму подписки по макету: e-mail, чекбокс согласия, кнопка.',
+        'Добавьте валидацию: корректный e-mail, согласие обязательно, ошибки показываются у поля.',
+        'Кнопка отправки блокируется на время «запроса» (имитация).',
+        'Коротко опишите, что бы вы улучшили при большем количестве времени.'
+      ],
+      materials:['Макет формы (ссылка)','Тексты ошибок от клиента'],
+      criteria:[
+        {n:'Работоспособность решения',w:35},
+        {n:'Чистота и организация кода',w:25},
+        {n:'Внимание к деталям (UX ошибок)',w:20},
+        {n:'Объяснение своих решений',w:20}
+      ],
+      followUp:'Что изменится в вашей валидации, если поле e-mail станет необязательным, но при заполнении — строгим? Ответ в 2–3 предложениях.',
+      feedback:{avg:'4,4',scores:[4.6,4.5,4.2,4.3],
+        strengths:['Форма работает на всех состояниях: пустая, ошибка, загрузка, успех','Код разбит на понятные функции с говорящими именами','Ошибки валидации показываются у поля и убираются при вводе'],
+        improve:['Добавить aria-атрибуты для доступности','Состояние загрузки вернуть, если запрос упал']},
+      candidates:[
+        {name:'Тимур Абдулов', meta:'ПетИТ, 3 курс, pet-проекты на GitHub', date:'3 ноя', avg:4.4, status:'rec',
+         scores:[4.6,4.5,4.2,4.3],
+         file:{name:'abdulov_subscription_form.html',size:12288,type:'html'},
+         solution:'HTML + CSS по макету (grid, переменные для цветов), JS: функции validateEmail, validateConsent, handleSubmit. Ошибки рендерятся в <span class="field-error"> под полем, снимаются по input. Кнопка: disabled + спиннер на 800 мс (имитация запроса)...\n\nЧто улучшил бы: aria-live для ошибок, debounce на input.',
+         comment:'Решение работает во всех состояниях, код читаемый. Видно, что человек писал сам, а не копировал: единый стиль и объяснение каждого решения.',
+         follow:{a:'Убрал бы обязательность на уровне схемы валидации, но оставил бы validateEmail для заполненного значения: пустое — ок, заполненное — строго. Иначе получим мусорные адреса в рассылке.', badge:'ok', btxt:'Самостоятельно, по делу'}},
+        {name:'Екатерина Мельник', meta:'Переподготовка, учебные проекты', date:'30 окт', avg:3.1, status:'wait',
+         scores:[3.4,3.0,2.9,3.1],
+         file:{name:'Melnik_forma_podpiski.docx',size:45056,type:'docx'},
+         solution:'Форма свёрстана, e-mail проверяется регулярным выражением. Чекбокс согласия есть, но валидация только на submit: если не отметить — форма просто не отправляется, сообщения об ошибке нет...',
+         comment:'Базовая валидация e-mail работает, но UX ошибок не продуман: пользователь не понимает, почему кнопка «не нажимается». Код рабочий, но без структуры.',
+         follow:{a:'Если e-mail необязательный, то валидацию можно вообще убрать, наверное.', badge:'lo', btxt:'Ответ неполный — валидацию заполненного поля убирать нельзя'}}
+      ]
+    }
+  ]
+};
+
+/* ============ СОСТОЯНИЕ ============ */
+const S = {
+  submitted:{},   // id вакансии => {answer, follow, file}
+  drafts:{},      // id вакансии => текст решения
+  files:{},       // id вакансии => {name, size}
+  created:[],     // вакансии, созданные в визарде
+  tab:{},         // активные вкладки на страницах вакансий
+  filter:'Все'
+};
+let wiz = null;
+
+/* ============ ХЕЛПЕРЫ ============ */
+const $=s=>document.querySelector(s);
+const allVac=()=>[...S.created, ...DB.vacancies];
+const byId=id=>allVac().find(v=>v.id===id);
+const scoreCls=v=>v>=4?'sc-hi':(v>=3?'sc-mid':'sc-lo');
+const barColor=v=>v>=4?'var(--g)':(v>=3?'var(--a)':'var(--r)');
+const statusBadge=s=>s==='rec'?'<span class="badge b-gl">Рекомендован</span>':s==='wait'?'<span class="badge b-al">На рассмотрении</span>':'<span class="badge b-rl">Проверить самостоятельность</span>';
+const statusLabel=s=>s==='rec'?'Рекомендован':s==='wait'?'На рассмотрении':'Требует проверки';
+const initials=n=>n.split(' ').map(x=>x[0]).join('');
+const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+const escT=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escA=t=>t.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+function critBlock(scores, criteria){
+  return criteria.map((c,i)=>{
+    const v=scores[i]||0;
+    return `<div class="crit"><div class="crit-head"><span>${c.n} <span class="w">· вес ${c.w}%</span></span><span class="${scoreCls(v)}"><b>${String(v).replace('.',',')}</b> / 5</span></div><div class="bar"><div class="fill" style="width:${v/5*100}%;background:${barColor(v)}"></div></div></div>`;
+  }).join('');
+}
+function toast(msg, ok){
+  const t=document.createElement('div');t.className='toast'+(ok?' ok':'');t.textContent=msg;
+  $('#toast-root').appendChild(t);setTimeout(()=>t.remove(),3200);
+}
+function openModal(html){$('#modal-body').innerHTML='<button class="x" onclick="App.closeModal()">✕</button>'+html;$('#modal-root').classList.add('open');}
+function closeModal(){$('#modal-root').classList.remove('open');}
+
+/* ============ КОМПОНЕНТЫ ============ */
+function vacCard(v){
+  const done=S.submitted[v.id];
+  return `<div class="card vac">
+    <div class="between"><span class="sph ${v.sc}">${v.icon} ${v.sphere}</span>${done?'<span class="badge b-gl">✓ Вы выполнили</span>':`<span class="badge b-gr">${v.level}</span>`}</div>
+    <h3>${v.title}</h3>
+    <div class="sm mut">${v.company} · ${v.city}</div>
+    <p class="sm mut">${v.short}</p>
+    <div class="divider" style="margin:8px 0"></div>
+    <div class="between sm mut"><span>🕐 Задание: ${v.taskTime}</span><span>${v.salary||''}</span></div>
+    <a href="#/candidate/vacancy/${v.id}" class="btn ${done?'btn-o':'btn-p'} btn-sm" style="justify-content:center">${done?'Посмотреть результат':'Смотреть задание'}</a>
+  </div>`;
+}
+
+function candRow(c){
+  return `<div class="cand" onclick="App.candidate('${c.vacId}','${c.idx}')">
+    <div class="ava">${initials(c.name)}</div>
+    <div style="flex:1">
+      <div class="row" style="gap:10px"><b>${c.name}</b>${statusBadge(c.status)}${c.flag?`<span class="flag">⚠ возможно ИИ</span>`:''}</div>
+      <div class="xs mut">${c.meta} · решение ${c.date}</div>
+      <div class="mini-crit">${c.scores.map(s=>`<i style="width:${s/5*34}px;background:${barColor(s)}"></i>`) .join('')}</div>
+    </div>
+    <div style="text-align:right"><div class="avg ${scoreCls(c.avg)}">${String(c.avg).replace('.',',')}</div><div class="xs mut">средний балл</div></div>
+  </div>`;
+}
+
+/* ============ ЭКРАНЫ ============ */
+
+function vHome(){
+  return `
+  <div class="hero">
+    <span class="badge b-pl" style="margin-bottom:18px">Платформа отбора начинающих специалистов</span>
+    <h1>Нанимайте не по резюме,<br>а по <em>реальной рабочей задаче</em></h1>
+    <p class="sub">Компания загружает свой кейс — мы адаптируем его под новичка и создаём критерии оценки. Кандидат решает задачу. Работодатель видит не «красивое резюме», а результат работы.</p>
+    <div class="cta">
+      <a class="btn btn-p btn-lg" href="#/employer">Смотреть кабинет работодателя</a>
+      <a class="btn btn-o btn-lg" href="#/candidate">Я кандидат — хочу попробовать</a>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="card stat"><div class="n">69,2%</div><p>студентов называют отсутствие опыта главным препятствием <br><span class="xs">наш опрос, 39 студентов</span></p></div>
+    <div class="card stat"><div class="n">76,9%</div><p>без опыта хотят показать навыки через практическое задание <br><span class="xs">наш опрос, 39 студентов</span></p></div>
+    <div class="card stat"><div class="n">66,7%</div><p>готовы решать задание, только если оно похоже на реальную работу <br><span class="xs">наш опрос, 39 студентов</span></p></div>
+    <div class="card stat"><div class="n">≈50%</div><p>наймов не оправдывали ожиданий компании <br><span class="xs">наши интервью с 3 компаниями</span></p></div>
+  </div>
+
+  <h2 class="mt24" style="text-align:center">Как это работает</h2>
+  <div class="steps mt16">
+    <div class="card step"><div class="num">1</div><h3>Компания описывает вакансию</h3><p>Руководитель или HR заполняет вакансию: задачи, обязанности, реальный кейс — если он есть.</p></div>
+    <div class="card step"><div class="num">2</div><h3>Мы адаптируем кейс</h3><p>Убираем конфиденциальное, подгоняем сложность под новичка и формируем критерии оценки с весами.</p></div>
+    <div class="card step"><div class="num">3</div><h3>Кандидат решает задачу</h3><p>Задание похоже на первый месяц работы. После решения — уточняющие вопросы: защита от решений через ИИ.</p></div>
+    <div class="card step"><div class="num">4</div><h3>Оценка по критериям</h3><p>Работодатель видит результат работы, баллы по каждому критерию и рекомендацию. Приглашает только сильных.</p></div>
+  </div>
+
+  <h2 class="mt24" style="text-align:center">Что говорят работодатели<br><span class="sm mut" style="font-weight:500">— из наших интервью, и как это решает платформа</span></h2>
+  <div class="grid2 mt16">
+    <div class="card quote"><p>«Анкеты кандидатов-студентов жуткие: не раскрывают знания и навыки. Выбор падает на вуз, потому что иначе не выбрать»</p><div class="who">— руководитель юридического отдела, машиностроение</div></div>
+    <div class="card quote"><p>«Задание отнимает время руководителя, а HR не всегда может оценить профессиональную часть»</p><div class="who">— руководитель юридического отдела</div></div>
+    <div class="card quote"><p>«Соискатели решали задания формально или через ИИ, а на собеседовании терялись на похожих вопросах»</p><div class="who">— руководитель юридического отдела</div></div>
+    <div class="card quote"><p>«Сложно составить посильное задание для новичка и определить критерии оценки»</p><div class="who">— начальник отдела, инжиниринг</div></div>
+  </div>
+
+  <h2 class="mt24" style="text-align:center">Открытые вакансии</h2>
+  <div class="grid3 mt16">${DB.vacancies.map(vacCard).join('')}</div>`;
+}
+
+/* ---------- РАБОТОДАТЕЛЬ ---------- */
+function vEmployer(){
+  const vacs=allVac();
+  const totalC=vacs.reduce((a,v)=>a+(v.candidates?v.candidates.length:0),0);
+  const recC=vacs.reduce((a,v)=>a+(v.candidates?v.candidates.filter(c=>c.status==='rec').length:0),0);
+  return `
+  <div class="between mb16">
+    <div><h1>Кабинет работодателя</h1><p class="mut">ООО «Правовой стандарт» · руководитель</p></div>
+    <a href="#/employer/create" class="btn btn-p">+ Новая вакансия</a>
+  </div>
+
+  <div class="grid4 mb16">
+    <div class="card kpi"><div class="n">${vacs.length}</div><p>активных вакансий</p></div>
+    <div class="card kpi"><div class="n">${totalC}</div><p>решений от кандидатов</p></div>
+    <div class="card kpi"><div class="n" style="color:var(--g)">${recC}</div><p>рекомендованы к собеседованию</p></div>
+    <div class="card kpi"><div class="n">≈11 ч</div><p>сэкономлено времени руководителя</p></div>
+  </div>
+
+  <h2 class="mb16">Вакансии</h2>
+  ${vacs.map(v=>{
+    const done=v.candidates?v.candidates.filter(c=>c.status!=='risk').length:0;
+    const rec=v.candidates?v.candidates.filter(c=>c.status==='rec').length:0;
+    return `<div class="card mb16 pad">
+      <div class="between">
+        <div>
+          <div class="row" style="gap:10px"><span class="sph ${v.sc}">${v.icon} ${v.sphere}</span>${v.fresh?'<span class="badge b-pl">только создана</span>':''}</div>
+          <h3 class="mt8" style="font-size:19px"><a href="#/employer/vacancy/${v.id}" style="color:inherit">${v.title}</a></h3>
+          <div class="sm mut">${v.candidates&&v.candidates.length?`${v.candidates.length} ${v.candidates.length===1?'кандидат':'кандидата'} · ${done} проверено · ${rec} рекомендованы`:'кандидатов пока нет — вакансия опубликована, кандидаты уже могут откликнуться'}</div>
+        </div>
+        <a href="#/employer/vacancy/${v.id}" class="btn btn-o btn-sm">Открыть</a>
+      </div>
+    </div>`;
+  }).join('')}
+
+  <div class="card pad mt16" style="background:linear-gradient(135deg,#eef2ff,#f5f3ff);border-color:#e0e7ff">
+    <h3>🛡 Как мы проверяем самостоятельность решения</h3>
+    <p class="sm mt8" style="max-width:760px">После задания кандидат отвечает на уточняющие вопросы по своему решению. Скопированный у ИИ ответ легко вскрывается: кандидат не может объяснить собственный выбор. Плюс стиль решения сверяется с ответами на вопросы. Это ответ на боль из интервью: «решали через ИИ, а на собеседовании терялись».</p>
+  </div>`;
+}
+
+function vVacancyEmployer(id){
+  const v=byId(id); if(!v) return '<p>Вакансия не найдена</p>';
+  const tab=S.tab['e'+id]||'cand';
+  const cands=(v.candidates||[]).map((c,i)=>({...c,vacId:id,idx:i}));
+  const sorted=[...cands].sort((a,b)=>b.avg-a.avg);
+  return `
+  <a href="#/employer" class="back">← Кабинет работодателя</a>
+  <div class="card pad mb16">
+    <div class="between">
+      <div>
+        <span class="sph ${v.sc}">${v.icon} ${v.sphere}</span>
+        <h1 class="mt8" style="font-size:28px">${v.title}</h1>
+        <p class="mut sm">${v.company} · ${v.city} · ${v.level} · ${v.salary||''}</p>
+      </div>
+      ${v.fresh?'<span class="badge b-pl">Опубликована — кандидаты уже могут откликнуться</span>':`<div style="text-align:right"><div class="avg sc-hi">${v.candidates.filter(c=>c.status==='rec').length}</div><div class="xs mut">рекомендованы</div></div>`}
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="${tab==='cand'?'on':''}" onclick="App.setTab('e${id}','cand')">Кандидаты (${cands.length})</button>
+    <button class="${tab==='task'?'on':''}" onclick="App.setTab('e${id}','task')">Задание и критерии</button>
+    <button class="${tab==='funnel'?'on':''}" onclick="App.setTab('e${id}','funnel')">Воронка</button>
+  </div>
+
+  ${tab==='cand'?(cands.length?`<div class="card">${sorted.map(candRow).join('')}</div>`:
+    `<div class="card pad" style="text-align:center;padding:48px"><h3>Кандидатов пока нет</h3><p class="mut sm mt8">Вакансия опубликована — кандидаты уже могут откликнуться. Посмотреть, как её видят кандидаты: <a href="#/candidate">каталог вакансий →</a></p></div>`):''}
+
+  ${tab==='task'?`
+    <div class="grid2">
+      <div class="card pad">
+        <h3>Задание кандидата</h3>
+        <p class="sm mt8">${v.taskIntro}</p>
+        <div class="mt16">${v.taskSteps.map(s=>`<div class="tick">${s}</div>`).join('')}</div>
+        <div class="divider"></div>
+        <h3>Материалы</h3>
+        ${v.materials.map(m=>`<div class="sm mt8">📎 ${m}</div>`).join('')}
+        <div class="divider"></div>
+        <p class="xs mut">Решения принимаются файлом: PDF, HTML или DOCX — как документ, который кандидат отправил бы руководителю.</p>
+        <div class="divider"></div>
+        <div class="follow"><b>🛡 Уточняющий вопрос (анти-ИИ)</b><p class="sm mt8">${v.followUp}</p></div>
+      </div>
+      <div class="card pad">
+        <h3>Критерии оценки</h3>
+        <p class="sm mut mt8">Сформированы платформой. HR и руководитель видят одну и ту же шкалу — оценивать может даже неспециалист по предмету.</p>
+        <div class="mt16">
+          ${v.criteria.map(c=>`<div class="crit"><div class="crit-head"><span>${c.n}</span><span class="w">вес ${c.w}%</span></div><div class="bar"><div class="fill" style="width:${Math.min(c.w*2.5,100)}%;background:linear-gradient(90deg,var(--p),var(--p2))"></div></div></div>`).join('')}
+        </div>
+        <div class="divider"></div>
+        <p class="xs mut">Сложность: уровень новичка · Время: ${v.taskTime} · Конфиденциальное удалено ✓</p>
+      </div>
+    </div>`:''}
+
+  ${tab==='funnel'?`
+    <div class="grid4">
+      <div class="card kpi"><div class="n">${cands.length}</div><p>откликнулись</p></div>
+      <div class="card kpi"><div class="n">${cands.length}</div><p>отправили решение</p></div>
+      <div class="card kpi"><div class="n">${cands.filter(c=>c.status!=='risk').length}</div><p>проверено</p></div>
+      <div class="card kpi"><div class="n" style="color:var(--g)">${cands.filter(c=>c.status==='rec').length}</div><p>к собеседованию</p></div>
+    </div>
+    <div class="card pad mt16"><h3>Что это экономит</h3>
+      <p class="sm mt8">Без платформы: ${cands.length} анкет резюме + ${cands.length} первичных собеседования ≈ 6–8 часов руководителя на «может быть».<br>С платформой: смотреть решения и критерии 2 кандидатов ≈ 30–40 минут.</p></div>`:''}`;
+}
+
+function candModal(vacId, idx){
+  const v=byId(vacId); const c=v.candidates[idx];
+  openModal(`
+    <div class="pad">
+      <div class="between" style="margin-right:36px">
+        <div class="row"><div class="ava">${initials(c.name)}</div>
+          <div><b style="font-size:17px">${c.name}</b><div class="xs mut">${c.meta} · решение отправлено ${c.date}</div></div></div>
+        <div style="text-align:right"><div class="avg ${scoreCls(c.avg)}">${String(c.avg).replace('.',',')}</div><div class="xs mut">средний балл</div></div>
+      </div>
+      <div class="mt8">${statusBadge(c.status)}${c.flag?` <span class="flag">⚠ ${c.flag}</span>`:''}</div>
+
+      <h3 class="mt16">Оценка по критериям</h3>
+      ${critBlock(c.scores,v.criteria)}
+
+      <h3 class="mt16">Решение кандидата — файл</h3>
+      <div class="filebar mt8">
+        <span class="fico">${App.fileIcon(c.file.type)}</span>
+        <div class="fmeta"><b>${esc(c.file.name)}</b><div class="xs mut">${App.fmtSize(c.file.size)} · ${App.typeLabel(c.file.type)}</div></div>
+        <span class="badge b-gr">${(c.file.type||'').toUpperCase()}</span>
+      </div>
+      <p class="xs mut mt8">Предпросмотр содержимого:</p>
+      <div class="sol-text">${esc(c.solution)}${c.solution.endsWith('…')||c.solution.endsWith('...')?'<span class="xs mut"> (фрагмент)</span>':''}</div>
+
+      <h3 class="mt16">🛡 Уточняющий вопрос (проверка самостоятельности)</h3>
+      <p class="sm mut mt8">«${v.followUp}»</p>
+      <div class="follow mt8"><p class="sm"><b>Ответ:</b> ${c.follow.a}</p><div class="mt8"><span class="badge ${c.follow.badge==='ok'?'b-gl':c.follow.badge==='mid'?'b-al':'b-rl'}">${c.follow.btxt}</span></div></div>
+
+      <h3 class="mt16">Комментарий проверяющего</h3>
+      <p class="sm mt8">${c.comment}</p>
+
+      <div class="divider"></div>
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn btn-o" onclick="App.closeModal();App.decide('${vacId}',${idx},'decline')">Отказать</button>
+        <button class="btn btn-g" onclick="App.closeModal();App.decide('${vacId}',${idx},'invite')">Пригласить на собеседование</button>
+      </div>
+    </div>`);
+}
+
+/* ---------- ВИЗАРД СОЗДАНИЯ ВАКАНСИИ ---------- */
+function vCreate(){
+  if(!wiz) wiz={step:1,title:'Юрист-стажёр (договорная работа)',sphere:'Юриспруденция',
+    desc:'Проверка договоров поставки и аренды, подготовка заключений, претензионная работа под контролем юриста.',
+    caseText:DEFAULT_CASE,noCase:false,processing:false};
+  const steps=['Вакансия','Ваш кейс','Адаптация','Готово'];
+  return `
+  <a href="#/employer" class="back">← Кабинет работодателя</a>
+  <h1 class="mb16">Новая вакансия</h1>
+  <div class="wiz-steps">${steps.map((s,i)=>`<div class="wstep ${wiz.step===i+1?'on':wiz.step>i+1?'done':''}">${wiz.step>i+1?'✓ ':''}${i+1}. ${s}</div>`).join('')}</div>
+  ${wiz.step===1?`
+    <div class="card pad" style="max-width:680px">
+      <div class="field"><label>Название вакансии</label><input type="text" value="${escA(wiz.title)}" oninput="wiz.title=this.value"></div>
+      <div class="field"><label>Сфера</label><select onchange="wiz.sphere=this.value">
+        <option ${wiz.sphere==='Юриспруденция'?'selected':''}>Юриспруденция</option>
+        <option ${wiz.sphere==='Маркетинг'?'selected':''}>Маркетинг</option>
+        <option ${wiz.sphere==='IT'?'selected':''}>IT</option></select></div>
+      <div class="field"><label>Чем будет заниматься сотрудник</label><textarea rows="4" oninput="wiz.desc=this.value">${escT(wiz.desc)}</textarea></div>
+      <p class="hint">Этого достаточно, чтобы платформа поняла контекст. Полного описания вакансии, как на hh.ru, не требуется.</p>
+      <div class="row mt16" style="justify-content:flex-end"><button class="btn btn-p" onclick="App.wizNext(2)">Далее →</button></div>
+    </div>`:''}
+
+  ${wiz.step===2?`
+    <div class="card pad" style="max-width:760px">
+      <h3>Вставьте реальный кейс или задачу сотрудника</h3>
+      <p class="sm mut mt8">Так, как он есть сейчас, — с номерами договоров, именами и суммами. Мы сами уберём всё конфиденциальное на следующем шаге. Это займёт у вас 2 минуты вместо часов на придумывание задания.</p>
+      <div class="field mt16"><textarea rows="10" oninput="wiz.caseText=this.value">${escT(wiz.caseText)}</textarea>
+      <p class="hint">Текст уже вставлен — замените на свой в любой момент.</p></div>
+      <label class="row sm" style="gap:8px;cursor:pointer"><input type="checkbox" ${wiz.noCase?'checked':''} onchange="wiz.noCase=this.checked"> У нас нет готового кейса — создайте задание по описанию вакансии</label>
+      <div class="row mt16" style="justify-content:space-between">
+        <button class="btn btn-o" onclick="App.wizNext(1)">← Назад</button>
+        <button class="btn btn-p" onclick="App.wizAdapt()">Адаптировать задание →</button>
+      </div>
+    </div>`:''}
+
+  ${wiz.step===3?(wiz.processing?`
+    <div class="proc"><div class="spin"></div><h3>Адаптируем кейс…</h3>
+      <ul><li class="done">Определяем тип задачи и роль</li><li class="done">Находим конфиденциальные фрагменты</li><li class="act">Заменяем на нейтральные аналоги</li><li>Подбираем сложность под новичка</li><li>Формируем критерии оценки</li></ul></div>`:`
+
+    <div class="grid2">
+      <div class="card diffbox">
+        <h4 class="mut">Ваш кейс (как был)</h4>
+        ${DEFAULT_CASE_HTML}
+      </div>
+      <div class="card diffbox">
+        <h4 style="color:var(--g)">Задание кандидата (как стало)</h4>
+        Проверить <mark class="anon">договор подряда № 147</mark> между <mark class="anon">ООО «Альфа»</mark> и <mark class="anon">АО «Бета»</mark> на сумму <mark class="anon">N ₽ (сумма — в приложении)</mark> <span class="del">контакт заказчика: Иванов Иван Иванович, +7 921 555-34-12, ivanov@…</span><br><br>
+        Нужно: выявить риски для заказчика (сроки, ответственность, порядок приёмки) и предложить правки. <span class="del">Внутренняя заметка: у нас с ними была претензия по прошлому договору № 89/2024…</span>
+        <div class="divider"></div>
+        <p class="xs"><b>Платформа добавила структуру:</b> найдите 3–4 рискованных пункта → норма ГК РФ → готовая правка → заключение на 5–7 предложений.</p>
+        <p class="xs mt8"><b>Сложность:</b> уровень новичка · <b>Время:</b> 2,5 часа · <b>Материалы:</b> адаптированный договор + шаблон заключения</p>
+      </div>
+    </div>
+    <div class="card pad mt16">
+      <h3>Сформированные критерии оценки</h3>
+      <p class="sm mut mt8">Можно менять веса — шкала едина для руководителя и HR.</p>
+      <div class="mt16">
+        <span class="chip">Выявление ключевых рисков <input type="number" value="30" class="num-in">%</span>
+        <span class="chip">Знание норм (ГК РФ) <input type="number" value="25" class="num-in">%</span>
+        <span class="chip">Качество правок <input type="number" value="25" class="num-in">%</span>
+        <span class="chip">Ясность заключения <input type="number" value="20" class="num-in">%</span>
+      </div>
+      <div class="follow mt16"><b>🛡 Уточняющий вопрос после решения (анти-ИИ)</b><p class="sm mt8">«В 2–3 предложениях объясните: какую норму вы считаете ключевой для защиты заказчика и почему именно она?»</p></div>
+      <div class="row mt16" style="justify-content:space-between">
+        <button class="btn btn-o" onclick="App.wizNext(2)">← Изменить кейс</button>
+        <button class="btn btn-g" onclick="App.wizPublish()">Опубликовать вакансию</button>
+      </div>
+    </div>`):''}
+
+  ${wiz.step===4?`
+    <div class="card pad" style="max-width:640px;margin:32px auto;text-align:center">
+      <div style="font-size:52px">🎉</div>
+      <h2 class="mt8">Вакансия опубликована</h2>
+      <p class="mut mt8">Задание адаптировано, критерии готовы. Кандидаты уже видят вакансию в каталоге и могут решать задачу.</p>
+      <div class="card pad mt16" style="background:var(--gl);border-color:#a7f3d0;text-align:left">
+        <p class="sm"><b>Что дальше:</b> вы получите решения с оценками по критериям и ответами на уточняющие вопросы. Приглашать на собеседование — только тех, кто решал сам и решил хорошо.</p>
+      </div>
+      <div class="cta mt16">
+        <a class="btn btn-p" href="#/employer/vacancy/${wiz.newId}">Открыть вакансию</a>
+        <a class="btn btn-o" href="#/candidate">Посмотреть глазами кандидата</a>
+      </div>
+    </div>`:''}`;
+}
+
+const DEFAULT_CASE=`Проверить договор подряда № 147/2025 от 12.08.2025 между ООО «Призма Инжиниринг» и АО «СеверСтрой». Сумма 4 250 000 ₽. Контакт заказчика: Иванов Иван Иванович, +7 921 555-34-12, ivanov@severstroy.ru.
+Внутренняя заметка: у нас с ними была претензия по прошлому договору № 89/2024 (сорванные сроки).
+Нужно: выявить риски для заказчика (сроки, ответственность, порядок приёмки), предложить правки.`;
+
+const DEFAULT_CASE_HTML=`Проверить <mark class="conf">договор подряда № 147/2025 от 12.08.2025</mark> между <mark class="conf">ООО «Призма Инжиниринг»</mark> и <mark class="conf">АО «СеверСтрой»</mark>. Сумма <mark class="conf">4 250 000 ₽</mark>. <mark class="conf">Контакт заказчика: Иванов Иван Иванович, +7 921 555-34-12, ivanov@severstroy.ru.</mark><br><br><mark class="conf">Внутренняя заметка: у нас с ними была претензия по прошлому договору № 89/2024 (сорванные сроки).</mark><br><br>Нужно: выявить риски для заказчика (сроки, ответственность, порядок приёмки), предложить правки.`;
+
+/* ---------- КАНДИДАТ ---------- */
+function vCatalog(){
+  const vacs=allVac();
+  const f=S.filter;
+  const list=f==='Все'?vacs:vacs.filter(v=>v.sphere===f);
+  return `
+  <div class="hero" style="padding-bottom:24px">
+    <h1 style="font-size:34px">Докажи навыки <em>без опыта</em> — реши реальную задачу</h1>
+    <p class="sub">Здесь отбирают не по резюме. Тебе дают задачу, похожую на первый месяц работы, — а работодатель видит, что ты умеешь на деле. Даже без строчки опыта в резюме.</p>
+  </div>
+  <div class="pill-list mb16">${['Все','Юриспруденция','Маркетинг','IT'].map(x=>`<button class="btn btn-sm ${f===x?'btn-p':'btn-o'}" onclick="App.setFilter('${x}')">${x}</button>`).join('')}</div>
+  <div class="grid3">${list.map(vacCard).join('')}</div>`;
+}
+
+function vVacancyCandidate(id){
+  const v=byId(id); if(!v) return '<p>Вакансия не найдена</p>';
+  const done=S.submitted[id];
+  return `
+  <a href="#/candidate" class="back">← Каталог вакансий</a>
+  <div class="grid2">
+    <div>
+      <span class="sph ${v.sc}">${v.icon} ${v.sphere}</span>
+      <h1 class="mt8" style="font-size:30px">${v.title}</h1>
+      <p class="mut">${v.company} · ${v.city}</p>
+      <p class="mt16">${v.short}</p>
+      <div class="card pad mt16">
+        <h3>Оценят не по резюме</h3>
+        <p class="sm mut mt8">Приглашение на собеседование получают за решение задачи. Резюме без опыта — не помеха, вуз не важен.</p>
+      </div>
+      ${done?`<div class="card pad mt16" style="background:var(--gl);border-color:#a7f3d0">
+        <h3 style="color:var(--g)">✓ Вы выполнили это задание</h3>
+        <a href="#/candidate/result/${id}" class="btn btn-g btn-sm mt8">Посмотреть обратную связь</a></div>`:''}
+    </div>
+    <div class="card pad">
+      <h3>Задание</h3>
+      <p class="sm mt8">${v.taskIntro}</p>
+      <div class="mt16">${v.taskSteps.map(s=>`<div class="tick">${s}</div>`).join('')}</div>
+      <div class="divider"></div>
+      <h3>Материалы</h3>
+      ${v.materials.map(m=>`<div class="sm mt8">📎 ${m}</div>`).join('')}
+      <div class="divider"></div>
+      <h3>По каким критериям оценят</h3>
+      <div class="pill-list mt8">${v.criteria.map(c=>`<span class="chip">${c.n} <span class="w">· ${c.w}%</span></span>`).join('')}</div>
+      <p class="xs mut mt8">Критерии открыты заранее — ты знаешь правила игры. Решение отправляется одним файлом: PDF, HTML или DOCX.</p>
+      <div class="divider"></div>
+      <div class="between">
+        <span class="timer">🕐 ${v.taskTime} на выполнение</span>
+        <a href="#/candidate/task/${id}" class="btn btn-p">${done?'Решение отправлено':'Приступить →'}</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function vTask(id){
+  const v=byId(id);
+  const draft=S.drafts[id]||'';
+  const file=S.files[id]||null;
+  return `
+  <a href="#/candidate/vacancy/${id}" class="back">← О вакансии</a>
+  <div class="between mb16">
+    <h1 style="font-size:24px">${v.title}</h1>
+    <span class="timer">🕐 осталось ~${v.taskTime}</span>
+  </div>
+  <div class="task-grid">
+    <div class="card pad">
+      <h3>Условие</h3>
+      <p class="sm mt8">${v.taskIntro}</p>
+      <div class="mt16">${v.taskSteps.map(s=>`<div class="tick">${s}</div>`).join('')}</div>
+      <div class="divider"></div>
+      ${v.materials.map(m=>`<div class="sm mt8">📎 ${m}</div>`).join('')}
+    </div>
+    <div class="card pad">
+      <h3>Ваше решение — файлом</h3>
+      <p class="xs mut mt8">Оформите решение как документ, который вы отправили бы руководителю: заключение, план или страница с кодом.</p>
+      <input type="file" id="fileinp" accept=".pdf,.html,.htm,.docx,.txt,.md" style="display:none" onchange="App.pickFile('${id}',this.files[0])">
+      ${file?`
+      <div class="filechip" style="margin-top:16px"><span class="fname">📎 ${esc(file.name)}</span><span class="sz">${App.fmtSize(file.size)}</span><button class="rm" title="Выбрать другой файл" onclick="App.rmFile('${id}')">✕</button></div>
+      `:`
+      <div class="dropzone mt16" onclick="document.getElementById('fileinp').click()" ondragover="App.dragOver(event)" ondragleave="App.dragLeave(event)" ondrop="App.dropFile(event,'${id}')">
+        <div class="ic">📄</div>
+        <div class="big">Перетащите файл сюда или нажмите для выбора</div>
+        <div class="fmts">PDF, HTML или DOCX · до 10 МБ</div>
+      </div>`}
+      <div class="field mt16"><label>Комментарий к решению <span class="mut" style="font-weight:500">· необязательно</span></label>
+        <textarea rows="4" id="sol" placeholder="На что обратить внимание при проверке, какие решения вы приняли и почему…">${escT(draft)}</textarea></div>
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn btn-p" onclick="App.submit('${id}')">Отправить решение →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function vProcessing(id){
+  const v=byId(id);
+  setTimeout(()=>{const l=$('#plist');if(l){l.children[1].classList.add('done');l.children[1].classList.remove('act');l.children[2].classList.add('act');}},900);
+  setTimeout(()=>{const l=$('#plist');if(l){l.children[2].classList.add('done');l.children[2].classList.remove('act');}},1800);
+  setTimeout(()=>{location.hash='#/candidate/answer/'+id;},2600);
+  return `
+  <div class="proc"><div class="spin"></div><h3>Решение отправлено</h3>
+  <p class="mut sm mt8">Платформа проверяет решение по критериям вакансии «${v.title}»</p>
+  <ul id="plist">
+    <li class="done">Файл решения получен</li>
+    <li class="act">Анализ по критериям вакансии</li>
+    <li>Уточняющий вопрос — защита от ИИ</li>
+    <li>Формирование обратной связи</li>
+  </ul></div>`;
+}
+
+function vAnswer(id){
+  const v=byId(id);
+  return `
+  <div class="proc" style="max-width:640px">
+    <div style="font-size:44px">🛡</div>
+    <h2 class="mt8">Один вопрос по вашему решению</h2>
+    <p class="mut mt8">Так мы проверяем, что решение написали вы, а не ИИ. Короткий честный ответ лучше длинного заученного.</p>
+    <div class="follow mt16" style="text-align:left"><p class="sm"><b>${v.followUp}</b></p></div>
+    <div class="editor-wrap mt16">
+      <div class="editor-head"><span>💬 Ваш ответ</span><span class="cnt" id="anscount">0 символов</span></div>
+      <textarea id="ans" class="solution-editor" style="min-height:130px" placeholder="Ваш ответ в 2–3 предложениях…" oninput="document.getElementById('anscount').textContent=App.symbols(this.value.length)"></textarea>
+    </div>
+    <div class="cta mt16"><button class="btn btn-p btn-lg" onclick="App.submitFollow('${id}')">Отправить ответ и увидеть оценку</button></div>
+  </div>`;
+}
+
+function vResult(id){
+  const v=byId(id);
+  const fb=v.feedback||{avg:'4,0',scores:v.criteria.map(()=>4),strengths:['Задание выполнено полностью, структура соблюдена','Решение привязано к условию задачи, а не общими словами'],improve:['Добавить больше конкретики и обоснований решений']};
+  const avgN=parseFloat(String(fb.avg).replace(',','.'));
+  return `
+  <div class="proc" style="max-width:720px;margin-top:32px">
+    <div style="font-size:52px">✅</div>
+    <h2 class="mt8">Готово! Ваша обратная связь</h2>
+    <p class="mut mt8">Результат и оценка уже видны работодателю: ${v.company}</p>
+    ${S.submitted[id]&&S.submitted[id].file?`<p class="sm mt8">📎 Ваше решение: <b>${esc(S.submitted[id].file.name)}</b> (${App.fmtSize(S.submitted[id].file.size)}) — передано работодателю</p>`:''}
+    <div class="card pad mt24" style="text-align:left">
+      <div class="between">
+        <h3>Оценка по критериям</h3>
+        <div class="avg ${scoreCls(avgN)}">${fb.avg} / 5</div>
+      </div>
+      ${critBlock(fb.scores,v.criteria)}
+      <div class="divider"></div>
+      <h3>💪 Сильные стороны</h3>
+      <div class="mt8">${fb.strengths.map(s=>`<div class="tick">${s}</div>`).join('')}</div>
+      <div class="divider"></div>
+      <h3>🌱 Что улучшить</h3>
+      <div class="mt8">${fb.improve.map(s=>`<div class="tick imp">${s}</div>`).join('')}</div>
+      <div class="divider"></div>
+      <div class="follow"><p class="sm"><b>Статус:</b> ${avgN>=4?'Сильное решение — вас рекомендуют пригласить на короткое интервью (30 минут, по сути уже знакомство).':avgN>=3?'Решение засчитано. Работодатель видит и сильные стороны, и зоны роста — решение за ним.':'Решение засчитано, но пока не проходит порог. Вы получили честную обратную связь — попробуйте другую вакансию.'}</p></div>
+    </div>
+    <div class="cta mt24">
+      <a href="#/candidate" class="btn btn-o btn-lg">Смотреть другие вакансии</a>
+    </div>
+    <p class="xs mut mt16">Даже при отказе вы уходите с обратной связью по критериям — этого не даст ни одно резюме.</p>
+  </div>`;
+}
+
+/* ============ РОУТЕР ============ */
+const routes=[
+  [/^#\/$/, ()=>vHome()],
+  [/^#\/employer$/, ()=>vEmployer()],
+  [/^#\/employer\/create$/, ()=>vCreate()],
+  [/^#\/employer\/vacancy\/(\w+)$/, m=>vVacancyEmployer(m[1])],
+  [/^#\/candidate$/, ()=>vCatalog()],
+  [/^#\/candidate\/vacancy\/(\w+)$/, m=>vVacancyCandidate(m[1])],
+  [/^#\/candidate\/task\/(\w+)$/, m=>vTask(m[1])],
+  [/^#\/candidate\/processing\/(\w+)$/, m=>vProcessing(m[1])],
+  [/^#\/candidate\/answer\/(\w+)$/, m=>vAnswer(m[1])],
+  [/^#\/candidate\/result\/(\w+)$/, m=>vResult(m[1])]
+];
+function render(){
+  const h=location.hash||'#/';
+  let html='<p>Страница не найдена. <a href="#/">На главную</a></p>';
+  for(const [re,fn] of routes){ const m=h.match(re); if(m){html=fn(m);break;} }
+  $('#app').innerHTML=html;
+  const page=h.startsWith('#/employer')?'emp':h.startsWith('#/candidate')?'cand':'home';
+  $('#nav').innerHTML=`
+    <a href="#/" class="${page==='home'?'on':''}">Главная</a>
+    <a href="#/employer" class="${page==='emp'?'on':''}">Работодателям</a>
+    <a href="#/candidate" class="${page==='cand'?'on':''}">Кандидатам</a>`;
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',render);
+
+/* ============ ДЕЙСТВИЯ ============ */
+const App={
+  symbols(n){const a=n%10,b=n%100;return n+' '+((a===1&&b!==11)?'символ':(a>=2&&a<=4&&(b<12||b>14))?'символа':'символов');},
+  fmtSize(b){return b<1024?b+' Б':b<1048576?(b/1024).toFixed(b<10240?1:0)+' КБ':(b/1048576).toFixed(1)+' МБ';},
+  fileIcon(t){return t==='pdf'?'📄':t==='html'?'🌐':'📝';},
+  typeLabel(t){return t==='pdf'?'PDF-документ':t==='html'?'HTML-документ':'Документ Word';},
+  pickFile(id,f){
+    if(!f)return;
+    if(!/\.(pdf|html?|docx|txt|md)$/i.test(f.name)){toast('Подойдёт файл PDF, HTML или DOCX');return;}
+    S.files[id]={name:f.name,size:f.size};
+    render();toast('Файл «'+f.name+'» приложен ✓',true);
+  },
+  rmFile(id){delete S.files[id];render();},
+  dragOver(e){e.preventDefault();e.currentTarget.classList.add('dragover');},
+  dragLeave(e){if(e.currentTarget.contains(e.relatedTarget))return;e.currentTarget.classList.remove('dragover');},
+  dropFile(e,id){
+    e.preventDefault();e.currentTarget.classList.remove('dragover');
+    const f=e.dataTransfer&&e.dataTransfer.files[0];
+    if(f)App.pickFile(id,f);
+  },
+  setTab(k,t){S.tab[k]=t;render();},
+  setFilter(f){S.filter=f;render();},
+  candidate(id,idx){candModal(id,idx);},
+  closeModal,
+  decide(vacId, idx, what){
+    const v=byId(vacId), c=v.candidates[idx];
+    if(what==='invite'){c.status='rec';toast(c.name+' приглашён(а) на собеседование ✓',true);}
+    else{c.status='wait';toast(c.name+': отказ отправлен с обратной связью');}
+    render();
+  },
+  wizNext(n){wiz.step=n;render();},
+  wizAdapt(){wiz.processing=true;wiz.step=3;render();setTimeout(()=>{wiz.processing=false;render();},2100);},
+  wizPublish(){
+    const id='v'+Date.now();
+    S.created.unshift({id,fresh:true,icon:'✨',sphere:wiz.sphere,
+      sc:wiz.sphere==='Юриспруденция'?'s-law':wiz.sphere==='Маркетинг'?'s-mkt':'s-it',
+      title:wiz.title||'Новая вакансия',company:'Ваша компания',city:'Санкт-Петербург',
+      level:'Можно без опыта',salary:'',work:'',short:wiz.desc,
+      taskTime:'2,5 часа',taskIntro:'Задание адаптировано из вашего кейса: конфиденциальное удалено, сложность — уровень новичка.',
+      taskSteps:['Найдите 3–4 рискованных пункта договора','Укажите применимую норму ГК РФ','Предложите готовую правку формулировки','Напишите заключение на 5–7 предложений'],
+      materials:['Договор подряда № 147 (адаптирован из вашего)','Шаблон заключения'],
+      criteria:[{n:'Выявление ключевых рисков',w:30},{n:'Знание норм (ГК РФ)',w:25},{n:'Качество правок',w:25},{n:'Ясность заключения',w:20}],
+      followUp:'В 2–3 предложениях объясните: какую норму вы считаете ключевой для защиты заказчика и почему именно она?',
+      candidates:[]});
+    wiz.step=4;wiz.newId=id;render();toast('Вакансия опубликована ✓',true);
+  },
+  submit(id){
+    if(!S.files[id]){toast('Приложите решение файлом: PDF, HTML или DOCX');return;}
+    S.drafts[id]=$('#sol')?$('#sol').value.trim():'';
+    location.hash='#/candidate/processing/'+id;
+  },
+  submitFollow(id){
+    const a=$('#ans')?$('#ans').value.trim():'';
+    if(a.length<10){toast('Ответьте коротко на вопрос — это важно');return;}
+    S.submitted[id]={answer:S.drafts[id]||'',follow:a,file:S.files[id]||null};
+    location.hash='#/candidate/result/'+id;toast('Решение и ответ отправлены работодателю ✓',true);
+  }
+};
+render();
+</script>
+</body>
+</html>
